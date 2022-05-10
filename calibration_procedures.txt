@@ -1,0 +1,16 @@
+Static calibration:
+Lay the WIP flat so that gravitational acceleration is mostly along one axis.
+Use collect_accstatic.ino to print acceleration readings to the Serial monitor.
+Use collect_accstatic_to_csv.py to save the readings to a csv file.
+Repeat these steps for each axis (six readings in total).
+Make sure each csv file has a title describing the orientation of the WIP.
+Collect the csv files and move them to the same folder as the MATLAB scripts.
+Run save_data_static.m to save the data to a .mat file.
+Run calib_static.m to get the sensitivity matrix and the offset vector for the body accelerometer.
+
+Pendulum calibration:
+Use collect_accpend.ino to print acceleration and potentiometer readings to the Serial monitor.
+Run collect_accstatic_to_csv.py. While running, move the pendulum slowly back and forth. Data is saved to a csv.
+Move the csv file to the same folder as the MATLAB scripts.
+Run save_data_pend.m to save the data to a .mat file.
+Run calib_pend.m to get the sensitivity matrices and the offset vectors for the pendulum accelerometers.

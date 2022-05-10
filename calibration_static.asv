@@ -1,0 +1,54 @@
+%save data from accelerometers for static calibration
+%save into tables
+%to use with calibration_static.m
+
+%Author: Alex Boehm
+%spring 2022 WIP senior design project
+
+close all
+clear
+
+%load readings from mat file
+acc = 'cart';
+load(strcat(acc,'_readings.mat'))
+
+raw_readings = {posx,negx,posy,negy,posz,negz};
+
+%construct b vector (assigned accelerations)
+g = 9.80665;    %m/s2 per g
+a_posx = [g;0;0];
+a_negx = - a_posx;
+a_posy = [0;g;0];
+a_negy = - a_posy;
+a_posz = [0;0;g];
+a_negz = - a_posz;
+b = [a_posx;a_negx;a_posy;a_negy;a_posz;a_negz];
+
+
+%construct A matrix (readings)
+A = zeros(length(b),12);    %initialize
+
+%iterate through each axis reading, create axis A matrix, append to overall
+%A matrix
+for cal_mode = 1:length(raw_readings)
+    
+    %retrieve readings
+    axis_readings = table2array(raw_readings{cal_mode});
+    
+    %get one value from readings per axis
+    Vs_cell = num2cell(mode(axis_readings,1));
+    [Vx,Vy,Vz] = Vs_cell{:};
+    
+    %create individual A matrix
+    A_axis = [Vx Vy Vz 0 0 0 0 0 0 1 0 0;0 0 0 Vx Vy Vz 0 0 0 0 1 0;...
+        0 0 0 0 0 0 Vx Vy Vz 0 0 1];
+    
+    %insert in overall A matrix
+    A(3*cal_mode-2:3*cal_mode,:) = A_axis;
+end
+
+
+%calculate unknowns (sensitivities and offsets) using psudeo inverse
+x = pinv(A)*b;
+S = reshape(x(1:9),[3,3]).';    %sensitivities
+O = x(10:12);                   %offsets
